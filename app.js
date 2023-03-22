@@ -20,6 +20,8 @@ const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 
+const MongoDBStore = require("connect-mongo");
+
 const dbUrl = process.env.DB_URL;
 //'mongodb://localhost:27017/yelp-camp'
 mongoose.connect(dbUrl, {
@@ -45,7 +47,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
 
+
+
 const sessionConfig = {
+    store: MongoDBStore.create({
+        mongoUrl: dbUrl
+    }),
     secret: 'thisshouldbeabettersecret!',
     resave: false,
     saveUninitialized: true,
@@ -95,7 +102,8 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err })
 })
 
-app.listen(3000, () => {
+port = process.env.port || 3000;
+app.listen(port, () => {
     console.log('Serving on port 3000')
 })
 
